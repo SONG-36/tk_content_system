@@ -47,3 +47,27 @@ class AuthInvalidError(DomainError):
     code = "AUTH_INVALID"
     message = "Bearer authentication is invalid."
     required_action = "Provide a valid API key."
+
+
+class IdempotencyKeyRequiredError(DomainError):
+    status_code = 422
+    code = "IDEMPOTENCY_KEY_REQUIRED"
+    message = "A valid Idempotency-Key header is required."
+    required_action = "Provide a non-empty Idempotency-Key header."
+    retryable = False
+
+
+class IdempotencyConflictError(DomainError):
+    status_code = 409
+    code = "IDEMPOTENCY_CONFLICT"
+    message = "The Idempotency-Key was already used for a different request."
+    required_action = "Use the original request payload or provide a new Idempotency-Key."
+    retryable = False
+
+
+class IdempotencyPendingError(DomainError):
+    status_code = 409
+    code = "IDEMPOTENCY_PENDING"
+    message = "An identical request with this Idempotency-Key is still pending."
+    required_action = "Retry the same request later with the same Idempotency-Key."
+    retryable = True

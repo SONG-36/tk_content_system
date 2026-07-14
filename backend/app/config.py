@@ -19,6 +19,8 @@ class Settings(BaseModel):
     owner_id: str = Field(default="owner_dev")
     database_url: str = Field(default="sqlite:///./backend.db")
     public_base_url: str = Field(default="http://localhost:8000")
+    idempotency_completed_ttl_hours: int = Field(default=24)
+    idempotency_pending_lease_seconds: int = Field(default=60)
 
 
 def load_settings() -> Settings:
@@ -37,6 +39,18 @@ def load_settings() -> Settings:
         public_base_url=os.getenv(
             "BACKEND_PUBLIC_BASE_URL",
             Settings.model_fields["public_base_url"].default,
+        ),
+        idempotency_completed_ttl_hours=int(
+            os.getenv(
+                "BACKEND_IDEMPOTENCY_COMPLETED_TTL_HOURS",
+                Settings.model_fields["idempotency_completed_ttl_hours"].default,
+            )
+        ),
+        idempotency_pending_lease_seconds=int(
+            os.getenv(
+                "BACKEND_IDEMPOTENCY_PENDING_LEASE_SECONDS",
+                Settings.model_fields["idempotency_pending_lease_seconds"].default,
+            )
         ),
     )
 

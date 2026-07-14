@@ -71,6 +71,8 @@ def test_config_can_be_overridden_by_test_environment(monkeypatch) -> None:
     monkeypatch.setenv("BACKEND_OWNER_ID", "owner_test")
     monkeypatch.setenv("BACKEND_DATABASE_URL", "sqlite:///./test.db")
     monkeypatch.setenv("BACKEND_PUBLIC_BASE_URL", "http://testserver")
+    monkeypatch.setenv("BACKEND_IDEMPOTENCY_COMPLETED_TTL_HOURS", "12")
+    monkeypatch.setenv("BACKEND_IDEMPOTENCY_PENDING_LEASE_SECONDS", "30")
 
     settings = load_settings()
 
@@ -80,6 +82,8 @@ def test_config_can_be_overridden_by_test_environment(monkeypatch) -> None:
     assert settings.owner_id == "owner_test"
     assert settings.database_url == "sqlite:///./test.db"
     assert settings.public_base_url == "http://testserver"
+    assert settings.idempotency_completed_ttl_hours == 12
+    assert settings.idempotency_pending_lease_seconds == 30
 
 
 def test_authenticated_route_maps_server_side_owner_id() -> None:
