@@ -1,0 +1,1774 @@
+{
+  "components": {
+    "schemas": {
+      "AIReviewStatus": {
+        "enum": [
+          "NOT_RUN"
+        ],
+        "title": "AIReviewStatus",
+        "type": "string"
+      },
+      "AssetKind": {
+        "enum": [
+          "INPUT_MEDIA",
+          "RESULT_MEDIA",
+          "REFERENCE"
+        ],
+        "title": "AssetKind",
+        "type": "string"
+      },
+      "AssetStatus": {
+        "enum": [
+          "PENDING_UPLOAD",
+          "READY",
+          "FAILED",
+          "EXPIRED",
+          "DELETED"
+        ],
+        "title": "AssetStatus",
+        "type": "string"
+      },
+      "AssetSummary": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "asset_kind": {
+            "$ref": "#/components/schemas/AssetKind"
+          },
+          "asset_status": {
+            "$ref": "#/components/schemas/AssetStatus"
+          },
+          "checksum_sha256": {
+            "title": "Checksum Sha256",
+            "type": "string"
+          },
+          "content_type": {
+            "title": "Content Type",
+            "type": "string"
+          },
+          "size_bytes": {
+            "title": "Size Bytes",
+            "type": "integer"
+          },
+          "usage_role": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/UsageRole"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "required": [
+          "asset_id",
+          "asset_kind",
+          "asset_status",
+          "content_type",
+          "size_bytes",
+          "checksum_sha256"
+        ],
+        "title": "AssetSummary",
+        "type": "object"
+      },
+      "AttemptStatus": {
+        "enum": [
+          "PREPARED",
+          "SUBMITTED",
+          "PROCESSING",
+          "SUCCEEDED",
+          "FAILED",
+          "CANCEL_REQUESTED",
+          "CANCELLED",
+          "UNKNOWN_PROVIDER_STATE"
+        ],
+        "title": "AttemptStatus",
+        "type": "string"
+      },
+      "AttemptSummary": {
+        "additionalProperties": false,
+        "properties": {
+          "attempt_id": {
+            "title": "Attempt Id",
+            "type": "string"
+          },
+          "attempt_no": {
+            "title": "Attempt No",
+            "type": "integer"
+          },
+          "attempt_status": {
+            "$ref": "#/components/schemas/AttemptStatus"
+          },
+          "cancel_requested_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Cancel Requested At"
+          },
+          "cancellation_intent": {
+            "title": "Cancellation Intent",
+            "type": "boolean"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "error_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Error Code"
+          },
+          "execution_provider": {
+            "$ref": "#/components/schemas/ExecutionProvider"
+          },
+          "provider_job_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Provider Job Id"
+          },
+          "submitted_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Submitted At"
+          },
+          "terminal_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Terminal At"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "attempt_id",
+          "attempt_no",
+          "attempt_status",
+          "execution_provider",
+          "cancellation_intent",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "AttemptSummary",
+        "type": "object"
+      },
+      "CancelJobRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "title": "CancelJobRequest",
+        "type": "object"
+      },
+      "CancelJobResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "attempt_status": {
+            "$ref": "#/components/schemas/AttemptStatus"
+          },
+          "cancel_requested_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Cancel Requested At"
+          },
+          "cancellation_intent": {
+            "title": "Cancellation Intent",
+            "type": "boolean"
+          },
+          "generation_status": {
+            "$ref": "#/components/schemas/GenerationStatus"
+          },
+          "idempotent_replay": {
+            "title": "Idempotent Replay",
+            "type": "boolean"
+          },
+          "job_id": {
+            "title": "Job Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "job_id",
+          "generation_status",
+          "attempt_status",
+          "cancellation_intent",
+          "idempotent_replay"
+        ],
+        "title": "CancelJobResponse",
+        "type": "object"
+      },
+      "ClientDeclaredFact": {
+        "additionalProperties": false,
+        "properties": {
+          "client_fact_id": {
+            "title": "Client Fact Id",
+            "type": "string"
+          },
+          "fact_type": {
+            "title": "Fact Type",
+            "type": "string"
+          },
+          "source_ref_ids": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Source Ref Ids",
+            "type": "array"
+          },
+          "subject": {
+            "title": "Subject",
+            "type": "string"
+          },
+          "value": {
+            "additionalProperties": true,
+            "title": "Value",
+            "type": "object"
+          }
+        },
+        "required": [
+          "client_fact_id",
+          "fact_type",
+          "subject",
+          "value"
+        ],
+        "title": "ClientDeclaredFact",
+        "type": "object"
+      },
+      "CreateVideoJobRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "aspect_ratio": {
+            "default": "9:16",
+            "enum": [
+              "9:16"
+            ],
+            "title": "Aspect Ratio",
+            "type": "string"
+          },
+          "client_declared_facts": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ClientDeclaredFact"
+            },
+            "title": "Client Declared Facts",
+            "type": "array"
+          },
+          "contract_version": {
+            "default": "v1",
+            "enum": [
+              "v1"
+            ],
+            "title": "Contract Version",
+            "type": "string"
+          },
+          "duration_seconds": {
+            "exclusiveMinimum": 0.0,
+            "title": "Duration Seconds",
+            "type": "integer"
+          },
+          "execution_provider": {
+            "$ref": "#/components/schemas/ExecutionProvider",
+            "default": "mock"
+          },
+          "expected_truth_rule_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Truth Rule Version"
+          },
+          "generation_mode": {
+            "$ref": "#/components/schemas/GenerationMode"
+          },
+          "hybrid_layers": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/HybridLayers"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "negative_constraints": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Negative Constraints",
+            "type": "array"
+          },
+          "preservation_constraints": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Preservation Constraints",
+            "type": "array"
+          },
+          "production_type": {
+            "$ref": "#/components/schemas/ProductionType"
+          },
+          "prompt": {
+            "title": "Prompt",
+            "type": "string"
+          },
+          "proof_needs": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ProofNeed"
+            },
+            "title": "Proof Needs",
+            "type": "array"
+          },
+          "reference_assets": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ReferenceAsset"
+            },
+            "title": "Reference Assets",
+            "type": "array"
+          },
+          "selected_model": {
+            "$ref": "#/components/schemas/SelectedModel",
+            "default": "Seedance"
+          },
+          "shot_number": {
+            "title": "Shot Number",
+            "type": "string"
+          },
+          "source_refs": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/SourceRef"
+            },
+            "title": "Source Refs",
+            "type": "array"
+          },
+          "truth_dependency": {
+            "$ref": "#/components/schemas/TruthDependency"
+          }
+        },
+        "required": [
+          "shot_number",
+          "production_type",
+          "generation_mode",
+          "prompt",
+          "truth_dependency",
+          "duration_seconds"
+        ],
+        "title": "CreateVideoJobRequest",
+        "type": "object"
+      },
+      "CreateVideoJobResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "ai_review_status": {
+            "$ref": "#/components/schemas/AIReviewStatus",
+            "default": "NOT_RUN"
+          },
+          "contract_version": {
+            "default": "v1",
+            "title": "Contract Version",
+            "type": "string"
+          },
+          "execution_provider": {
+            "$ref": "#/components/schemas/ExecutionProvider",
+            "default": "mock"
+          },
+          "generation_status": {
+            "$ref": "#/components/schemas/GenerationStatus",
+            "default": "QUEUED"
+          },
+          "idempotent_replay": {
+            "title": "Idempotent Replay",
+            "type": "boolean"
+          },
+          "job_id": {
+            "title": "Job Id",
+            "type": "string"
+          },
+          "provider_mapping_version": {
+            "title": "Provider Mapping Version",
+            "type": "string"
+          },
+          "truth_rule_version": {
+            "title": "Truth Rule Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "job_id",
+          "truth_rule_version",
+          "provider_mapping_version",
+          "idempotent_replay"
+        ],
+        "title": "CreateVideoJobResponse",
+        "type": "object"
+      },
+      "ErrorDetail": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "details": {
+            "additionalProperties": true,
+            "title": "Details",
+            "type": "object"
+          },
+          "field": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Field"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "request_id": {
+            "title": "Request Id",
+            "type": "string"
+          },
+          "required_action": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Required Action"
+          },
+          "retryable": {
+            "default": false,
+            "title": "Retryable",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "request_id"
+        ],
+        "title": "ErrorDetail",
+        "type": "object"
+      },
+      "ErrorResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ErrorDetail"
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "title": "ErrorResponse",
+        "type": "object"
+      },
+      "ExecutionProvider": {
+        "enum": [
+          "mock"
+        ],
+        "title": "ExecutionProvider",
+        "type": "string"
+      },
+      "GenerationMode": {
+        "enum": [
+          "T2V",
+          "I2V",
+          "R2V",
+          "FLF2V"
+        ],
+        "title": "GenerationMode",
+        "type": "string"
+      },
+      "GenerationStatus": {
+        "enum": [
+          "QUEUED",
+          "PROCESSING",
+          "SUCCEEDED",
+          "FAILED",
+          "CANCELLED"
+        ],
+        "title": "GenerationStatus",
+        "type": "string"
+      },
+      "GetVideoJobResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "ai_review_status": {
+            "$ref": "#/components/schemas/AIReviewStatus",
+            "default": "NOT_RUN"
+          },
+          "assets": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/AssetSummary"
+            },
+            "title": "Assets",
+            "type": "array"
+          },
+          "current_attempt": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AttemptSummary"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "errors": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/StoredJobError"
+            },
+            "title": "Errors",
+            "type": "array"
+          },
+          "generation_status": {
+            "$ref": "#/components/schemas/GenerationStatus"
+          },
+          "job_id": {
+            "title": "Job Id",
+            "type": "string"
+          },
+          "result_media": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ResultMediaSummary"
+            },
+            "title": "Result Media",
+            "type": "array"
+          }
+        },
+        "required": [
+          "job_id",
+          "generation_status"
+        ],
+        "title": "GetVideoJobResponse",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "HealthResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "contract_version": {
+            "default": "v1",
+            "title": "Contract Version",
+            "type": "string"
+          },
+          "environment": {
+            "title": "Environment",
+            "type": "string"
+          },
+          "request_id": {
+            "title": "Request Id",
+            "type": "string"
+          },
+          "service": {
+            "title": "Service",
+            "type": "string"
+          },
+          "status": {
+            "default": "ok",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "service",
+          "environment",
+          "request_id"
+        ],
+        "title": "HealthResponse",
+        "type": "object"
+      },
+      "HybridAiLayer": {
+        "additionalProperties": false,
+        "properties": {
+          "allowed_roles": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Allowed Roles",
+            "type": "array"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "prohibited_roles": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Prohibited Roles",
+            "type": "array"
+          },
+          "required": {
+            "title": "Required",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "required",
+          "description"
+        ],
+        "title": "HybridAiLayer",
+        "type": "object"
+      },
+      "HybridLayers": {
+        "additionalProperties": false,
+        "properties": {
+          "ai_layer": {
+            "$ref": "#/components/schemas/HybridAiLayer"
+          },
+          "ai_must_not_rewrite": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Ai Must Not Rewrite",
+            "type": "array"
+          },
+          "real_layer": {
+            "$ref": "#/components/schemas/HybridRealLayer"
+          }
+        },
+        "required": [
+          "real_layer",
+          "ai_layer",
+          "ai_must_not_rewrite"
+        ],
+        "title": "HybridLayers",
+        "type": "object"
+      },
+      "HybridRealLayer": {
+        "additionalProperties": false,
+        "properties": {
+          "carries_proof_need_ids": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Carries Proof Need Ids",
+            "type": "array"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "reference_asset_ids": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Reference Asset Ids",
+            "type": "array"
+          },
+          "required": {
+            "title": "Required",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "required",
+          "description"
+        ],
+        "title": "HybridRealLayer",
+        "type": "object"
+      },
+      "PresentationLayer": {
+        "enum": [
+          "REAL_CAPTURE",
+          "AI_VISUALIZATION",
+          "AI_ENVIRONMENT",
+          "STOCK_CONTEXT",
+          "TEXT_CLAIM"
+        ],
+        "title": "PresentationLayer",
+        "type": "string"
+      },
+      "PreservationLocks": {
+        "additionalProperties": false,
+        "properties": {
+          "lock_environment": {
+            "default": false,
+            "title": "Lock Environment",
+            "type": "boolean"
+          },
+          "lock_identity": {
+            "default": false,
+            "title": "Lock Identity",
+            "type": "boolean"
+          },
+          "lock_motion": {
+            "default": false,
+            "title": "Lock Motion",
+            "type": "boolean"
+          },
+          "lock_structure": {
+            "default": false,
+            "title": "Lock Structure",
+            "type": "boolean"
+          },
+          "lock_text": {
+            "default": false,
+            "title": "Lock Text",
+            "type": "boolean"
+          }
+        },
+        "title": "PreservationLocks",
+        "type": "object"
+      },
+      "ProductionType": {
+        "enum": [
+          "AI_GENERATION",
+          "HYBRID"
+        ],
+        "title": "ProductionType",
+        "type": "string"
+      },
+      "ProofNeed": {
+        "additionalProperties": false,
+        "properties": {
+          "linked_client_fact_ids": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Linked Client Fact Ids",
+            "type": "array"
+          },
+          "presentation_layer": {
+            "$ref": "#/components/schemas/PresentationLayer"
+          },
+          "production_type": {
+            "$ref": "#/components/schemas/ProductionType"
+          },
+          "proof_need_id": {
+            "title": "Proof Need Id",
+            "type": "string"
+          },
+          "proof_type": {
+            "$ref": "#/components/schemas/ProofType"
+          },
+          "required_evidence_refs": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Required Evidence Refs",
+            "type": "array"
+          },
+          "shot_id": {
+            "title": "Shot Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "proof_need_id",
+          "shot_id",
+          "proof_type",
+          "production_type",
+          "presentation_layer"
+        ],
+        "title": "ProofNeed",
+        "type": "object"
+      },
+      "ProofType": {
+        "enum": [
+          "identity",
+          "structure",
+          "accessory",
+          "function",
+          "result",
+          "human_efficacy",
+          "safety",
+          "sterilization",
+          "compatibility",
+          "before_after",
+          "suction",
+          "dirt_intake",
+          "transparent_bin",
+          "pet_hair",
+          "gap_access",
+          "attachment_performance",
+          "measurable_performance"
+        ],
+        "title": "ProofType",
+        "type": "string"
+      },
+      "ReferenceAsset": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "linked_proof_need_ids": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Linked Proof Need Ids",
+            "type": "array"
+          },
+          "preservation_locks": {
+            "$ref": "#/components/schemas/PreservationLocks"
+          },
+          "required_for_truth_gate": {
+            "default": false,
+            "title": "Required For Truth Gate",
+            "type": "boolean"
+          },
+          "shot_number": {
+            "title": "Shot Number",
+            "type": "string"
+          },
+          "usage_role": {
+            "$ref": "#/components/schemas/UsageRole"
+          }
+        },
+        "required": [
+          "asset_id",
+          "usage_role",
+          "shot_number"
+        ],
+        "title": "ReferenceAsset",
+        "type": "object"
+      },
+      "ResultMediaSummary": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "checksum_sha256": {
+            "title": "Checksum Sha256",
+            "type": "string"
+          },
+          "content_type": {
+            "title": "Content Type",
+            "type": "string"
+          },
+          "result_url": {
+            "format": "uri",
+            "minLength": 1,
+            "title": "Result Url",
+            "type": "string"
+          },
+          "result_url_expires_at": {
+            "format": "date-time",
+            "title": "Result Url Expires At",
+            "type": "string"
+          },
+          "size_bytes": {
+            "title": "Size Bytes",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "asset_id",
+          "content_type",
+          "size_bytes",
+          "result_url",
+          "result_url_expires_at",
+          "checksum_sha256"
+        ],
+        "title": "ResultMediaSummary",
+        "type": "object"
+      },
+      "RetryJobRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "title": "RetryJobRequest",
+        "type": "object"
+      },
+      "RetryJobResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "generation_status": {
+            "$ref": "#/components/schemas/GenerationStatus",
+            "default": "QUEUED"
+          },
+          "idempotent_replay": {
+            "title": "Idempotent Replay",
+            "type": "boolean"
+          },
+          "job_id": {
+            "title": "Job Id",
+            "type": "string"
+          },
+          "new_attempt_id": {
+            "title": "New Attempt Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "job_id",
+          "new_attempt_id",
+          "idempotent_replay"
+        ],
+        "title": "RetryJobResponse",
+        "type": "object"
+      },
+      "SelectedModel": {
+        "enum": [
+          "Seedance"
+        ],
+        "title": "SelectedModel",
+        "type": "string"
+      },
+      "SourceRef": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Asset Id"
+          },
+          "source_ref_id": {
+            "title": "Source Ref Id",
+            "type": "string"
+          },
+          "source_type": {
+            "$ref": "#/components/schemas/SourceType"
+          },
+          "source_value": {
+            "title": "Source Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source_ref_id",
+          "source_type",
+          "source_value"
+        ],
+        "title": "SourceRef",
+        "type": "object"
+      },
+      "SourceType": {
+        "enum": [
+          "USER_INPUT",
+          "UPLOADED_ASSET",
+          "PRODUCT_LINK",
+          "PRODUCT_SPEC_TEXT",
+          "PRIOR_SCRIPT",
+          "MANUAL_NOTE"
+        ],
+        "title": "SourceType",
+        "type": "string"
+      },
+      "StoredJobError": {
+        "additionalProperties": false,
+        "properties": {
+          "attempt_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Attempt Id"
+          },
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "created_at"
+        ],
+        "title": "StoredJobError",
+        "type": "object"
+      },
+      "TruthDependency": {
+        "enum": [
+          "low",
+          "medium",
+          "high"
+        ],
+        "title": "TruthDependency",
+        "type": "string"
+      },
+      "UploadUrlRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "checksum_sha256": {
+            "title": "Checksum Sha256",
+            "type": "string"
+          },
+          "content_type": {
+            "title": "Content Type",
+            "type": "string"
+          },
+          "contract_version": {
+            "default": "v1",
+            "enum": [
+              "v1"
+            ],
+            "title": "Contract Version",
+            "type": "string"
+          },
+          "intended_usage_role": {
+            "$ref": "#/components/schemas/UsageRole"
+          },
+          "size_bytes": {
+            "exclusiveMinimum": 0.0,
+            "title": "Size Bytes",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "content_type",
+          "size_bytes",
+          "checksum_sha256",
+          "intended_usage_role"
+        ],
+        "title": "UploadUrlRequest",
+        "type": "object"
+      },
+      "UploadUrlResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "asset_id": {
+            "title": "Asset Id",
+            "type": "string"
+          },
+          "asset_status": {
+            "$ref": "#/components/schemas/AssetStatus",
+            "default": "PENDING_UPLOAD"
+          },
+          "idempotent_replay": {
+            "title": "Idempotent Replay",
+            "type": "boolean"
+          },
+          "upload_url": {
+            "format": "uri",
+            "minLength": 1,
+            "title": "Upload Url",
+            "type": "string"
+          },
+          "upload_url_expires_at": {
+            "format": "date-time",
+            "title": "Upload Url Expires At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "asset_id",
+          "upload_url",
+          "upload_url_expires_at",
+          "idempotent_replay"
+        ],
+        "title": "UploadUrlResponse",
+        "type": "object"
+      },
+      "UsageRole": {
+        "enum": [
+          "PRODUCT_IDENTITY",
+          "FIRST_FRAME",
+          "LAST_FRAME",
+          "MOTION_REFERENCE",
+          "CAMERA_REFERENCE",
+          "ENVIRONMENT_REFERENCE",
+          "PROOF_EVIDENCE",
+          "SOURCE_CLIP"
+        ],
+        "title": "UsageRole",
+        "type": "string"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "BearerAuth": {
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "description": "Phase 2A mock backend Action contract. Backend design version 1.0; API contract v1; mock provider only.",
+    "title": "TikTok Shop Product Video Backend Action API",
+    "version": "v1"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "healthCheck",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Error Response"
+          }
+        },
+        "summary": "Health"
+      }
+    },
+    "/v1/assets/upload-url": {
+      "post": {
+        "operationId": "createAssetUploadUrl",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "maxLength": 255,
+              "minLength": 1,
+              "title": "Idempotency-Key",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadUrlRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadUrlResponse"
+                }
+              }
+            },
+            "description": "Created"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Error Response"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Error Response"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Error Response"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Error Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Error Response"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Error Response"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Create Upload Url",
+        "tags": [
+          "assets"
+        ]
+      }
+    },
+    "/v1/video-jobs": {
+      "post": {
+        "operationId": "createVideoJob",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "maxLength": 255,
+              "minLength": 1,
+              "title": "Idempotency-Key",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateVideoJobRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateVideoJobResponse"
+                }
+              }
+            },
+            "description": "Accepted"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Error Response"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Error Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Error Response"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Error Response"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Create Video Job",
+        "tags": [
+          "video-jobs"
+        ]
+      }
+    },
+    "/v1/video-jobs/{job_id}": {
+      "get": {
+        "operationId": "getVideoJob",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetVideoJobResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Error Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Error Response"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Error Response"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Get Video Job",
+        "tags": [
+          "video-jobs"
+        ]
+      }
+    },
+    "/v1/video-jobs/{job_id}/cancel": {
+      "post": {
+        "operationId": "cancelVideoJob",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "maxLength": 255,
+              "minLength": 1,
+              "title": "Idempotency-Key",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelJobRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CancelJobResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CancelJobResponse"
+                }
+              }
+            },
+            "description": "Accepted"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Error Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Error Response"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Error Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Error Response"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Error Response"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Cancel Video Job",
+        "tags": [
+          "video-jobs"
+        ]
+      }
+    },
+    "/v1/video-jobs/{job_id}/retry": {
+      "post": {
+        "operationId": "retryVideoJob",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "maxLength": 255,
+              "minLength": 1,
+              "title": "Idempotency-Key",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RetryJobRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetryJobResponse"
+                }
+              }
+            },
+            "description": "Accepted"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Error Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Error Response"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Error Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Error Response"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Error Response"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Retry Video Job",
+        "tags": [
+          "video-jobs"
+        ]
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000"
+    }
+  ]
+}
