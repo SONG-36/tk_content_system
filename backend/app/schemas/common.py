@@ -5,10 +5,12 @@ from __future__ import annotations
 from typing import Any
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import Field
+
+from app.schemas.base import APIModel
 
 
-class ErrorDetail(BaseModel):
+class ErrorDetail(APIModel):
     code: str
     message: str
     field: Optional[str] = None
@@ -18,13 +20,13 @@ class ErrorDetail(BaseModel):
     details: dict[str, Any] = Field(default_factory=dict)
 
 
-class ErrorResponse(BaseModel):
+class ErrorResponse(APIModel):
     error: ErrorDetail
 
 
-class HealthResponse(BaseModel):
-    status: str
+class HealthResponse(APIModel):
+    status: str = "ok"
     service: str
-    contract_version: str
+    contract_version: str = "v1"
     environment: str
     request_id: str
