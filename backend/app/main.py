@@ -14,11 +14,14 @@ from app.api.internal_mock_uploads import router as internal_mock_uploads_router
 from app.api.video_jobs import router as video_jobs_router
 from app.config import Settings, get_settings
 from app.dependencies import OwnerContext, require_owner_context
+from app.db.session import create_db_engine
 from app.middleware.request_id import request_id_middleware
 from app.schemas.assets import UploadUrlRequest
 from app.schemas.common import ErrorDetail, ErrorResponse
 from app.schemas.jobs import CreateVideoJobRequest
 from app.services.errors import DomainError
+from app.services.startup_recovery import StartupRecoveryService
+from sqlalchemy.orm import sessionmaker
 
 
 def _request_id(request: Request) -> str:
@@ -62,6 +65,17 @@ def create_app(
         app.dependency_overrides[get_settings] = lambda: settings_override
 
     app.middleware("http")(request_id_middleware)
+
+    @app.on_event("startup")
+    async def recover_interrupted_mock_attempts() -> None:
+        engine = create_db_engine(settings.database_url)
+        session_factory = sessionmaker(
+            bind=engine,
+            autoflush=False,
+            autocommit=False,
+            future=True,
+        )
+        StartupRecoveryService(session_factory=session_factory).recover_mock_attempts()
 
     @app.exception_handler(DomainError)
     async def handle_domain_error(request: Request, exc: DomainError) -> JSONResponse:

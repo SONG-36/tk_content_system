@@ -43,6 +43,8 @@ ALLOWED_ASSET_CONTENT_TYPES = {"image/png", "image/jpeg", "video/mp4"}
 class ServiceResponse:
     status_code: int
     payload: dict[str, Any]
+    dispatch_required: bool = False
+    job_id: Optional[str] = None
 
 
 class VideoJobService:
@@ -110,6 +112,8 @@ class VideoJobService:
             return ServiceResponse(
                 status_code=acquired.response_status_code or 200,
                 payload=acquired.response_json or {},
+                dispatch_required=False,
+                job_id=acquired.resource_id,
             )
 
         try:
@@ -196,7 +200,12 @@ class VideoJobService:
             resource_type="video_job",
             resource_id=job.job_id,
         )
-        return ServiceResponse(status_code=202, payload=payload)
+        return ServiceResponse(
+            status_code=202,
+            payload=payload,
+            dispatch_required=True,
+            job_id=job.job_id,
+        )
 
     def _validate_versions_and_provider(self, request: CreateVideoJobRequest) -> None:
         if (

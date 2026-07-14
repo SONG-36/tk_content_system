@@ -574,11 +574,11 @@ def test_create_video_job_success_persists_job_attempt_snapshot_and_refs(
     with SessionLocal() as session:
         job = session.get(VideoJob, body["job_id"])
         assert job is not None
-        assert job.generation_status == GenerationStatus.QUEUED
+        assert job.generation_status == GenerationStatus.SUCCEEDED
         assert job.ai_review_status == AIReviewStatus.NOT_RUN
         attempt = session.get(JobAttempt, job.current_attempt_id)
         assert attempt is not None
-        assert attempt.attempt_status == AttemptStatus.PREPARED
+        assert attempt.attempt_status == AttemptStatus.SUCCEEDED
         assert attempt.attempt_no == 1
         snapshot = session.scalar(
             select(GenerationRequestSnapshot).where(

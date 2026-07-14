@@ -41,6 +41,16 @@ class LocalMockStorage:
             raise
         return str(final_path)
 
+    def write_result_atomic(
+        self, *, asset_id: str, content_type: str, data: bytes
+    ) -> str:
+        result_storage = LocalMockStorage(str(self.base_directory / "results"))
+        return result_storage.write_atomic(
+            asset_id=asset_id,
+            content_type=content_type,
+            data=data,
+        )
+
     def delete(self, storage_path: str) -> None:
         path = Path(storage_path).expanduser().resolve()
         try:

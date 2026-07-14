@@ -118,6 +118,34 @@ class AssetRepository:
             session.refresh(asset)
             return _snapshot(asset)
 
+    def create_result_media(
+        self,
+        session: Session,
+        *,
+        asset_id: str,
+        owner_id: str,
+        content_type: str,
+        size_bytes: int,
+        checksum_sha256: str,
+        storage_path: str,
+        now: datetime,
+    ) -> AssetSnapshot:
+        asset = Asset(
+            asset_id=asset_id,
+            owner_id=owner_id,
+            asset_kind=AssetKind.RESULT_MEDIA,
+            status=AssetStatus.READY,
+            content_type=content_type,
+            size_bytes=size_bytes,
+            checksum_sha256=checksum_sha256,
+            storage_path=storage_path,
+            created_at=now,
+            updated_at=now,
+        )
+        session.add(asset)
+        session.flush()
+        return _snapshot(asset)
+
 
 def _snapshot(asset: Asset) -> AssetSnapshot:
     return AssetSnapshot(

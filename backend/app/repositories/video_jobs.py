@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 
 from app.db.types import AIReviewStatus, GenerationStatus, generate_prefixed_id
@@ -98,6 +98,44 @@ class VideoJobRepository:
         with self._session_factory() as session:
             job = session.get(VideoJob, job_id)
             return _snapshot(job) if job is not None else None
+
+    def transition_job(
+        self,
+        session: Session,
+        *,
+        job_id: str,
+        expected_status: GenerationStatus,
+        target_status: GenerationStatus,
+        now: datetime,
+    ) -> bool:
+        result = session.execute(
+            update(VideoJob)
+            .where(VideoJob.job_id == job_id)
+            .where(VideoJob.generation_status == expected_status)
+            .values(generation_status=target_status, updated_at=now)
+        )
+        return result.rowcount == 1
+
+    def mark_current_job_failed_for_attempt(
+        self,
+        session: Session,
+        *,
+        job_id: str,
+        current_attempt_id: str,
+        now: datetime,
+    ) -> bool:
+        result = session.execute(
+            update(VideoJob)
+            .where(VideoJob.job_id == job_id)
+            .where(VideoJob.current_attempt_id == current_attempt_id)
+            .where(
+                VideoJob.generation_status.in_(
+                    [GenerationStatus.QUEUED, GenerationStatus.PROCESSING]
+                )
+            )
+            .values(generation_status=GenerationStatus.FAILED, updated_at=now)
+        )
+        return result.rowcount == 1
 
 
 def _snapshot(job: VideoJob) -> VideoJobSnapshot:

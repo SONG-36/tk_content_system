@@ -15,6 +15,7 @@ from app.db.session import create_db_engine
 from app.services.assets import AssetService
 from app.services.errors import AuthInvalidError, AuthRequiredError
 from app.services.video_jobs import VideoJobService
+from app.runners.mock_provider import MockProviderRunner
 
 bearer_scheme = HTTPBearer(auto_error=False)
 
@@ -52,6 +53,13 @@ def get_asset_service(settings: Settings = Depends(get_settings)) -> AssetServic
 
 def get_video_job_service(settings: Settings = Depends(get_settings)) -> VideoJobService:
     return VideoJobService(
+        settings=settings,
+        session_factory=_session_factory_for_url(settings.database_url),
+    )
+
+
+def get_mock_provider_runner(settings: Settings = Depends(get_settings)) -> MockProviderRunner:
+    return MockProviderRunner(
         settings=settings,
         session_factory=_session_factory_for_url(settings.database_url),
     )

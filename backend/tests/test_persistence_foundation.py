@@ -43,7 +43,9 @@ APPROVED_TABLES = {
 
 
 def alembic_config(database_url: str) -> Config:
-    config = Config(str(Path("alembic.ini").resolve()))
+    backend_dir = Path(__file__).resolve().parents[1]
+    config = Config(str(backend_dir / "alembic.ini"))
+    config.set_main_option("script_location", str(backend_dir / "alembic"))
     config.set_main_option("sqlalchemy.url", database_url)
     return config
 
