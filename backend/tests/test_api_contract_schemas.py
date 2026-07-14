@@ -437,12 +437,12 @@ def test_request_validation_error_uses_unified_422_envelope() -> None:
     assert payload["error"]["details"]["errors"]
 
 
-def test_no_formal_api_routes_added_beyond_health() -> None:
+def test_formal_api_routes_match_phase_2a_5_surface() -> None:
     app = create_app()
-    ignored = {"/openapi.json", "/docs", "/docs/oauth2-redirect", "/redoc"}
-    routes = {route.path for route in app.routes if route.path not in ignored}
+    schema_paths = set(app.openapi()["paths"])
 
-    assert routes == {"/health"}
+    assert schema_paths == {"/health", "/v1/assets/upload-url"}
+    assert "/_internal/mock-uploads/{token}" not in schema_paths
 
 
 def test_database_metadata_still_has_only_seven_tables() -> None:

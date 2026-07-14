@@ -73,6 +73,10 @@ def test_config_can_be_overridden_by_test_environment(monkeypatch) -> None:
     monkeypatch.setenv("BACKEND_PUBLIC_BASE_URL", "http://testserver")
     monkeypatch.setenv("BACKEND_IDEMPOTENCY_COMPLETED_TTL_HOURS", "12")
     monkeypatch.setenv("BACKEND_IDEMPOTENCY_PENDING_LEASE_SECONDS", "30")
+    monkeypatch.setenv("BACKEND_MOCK_STORAGE_DIRECTORY", "/tmp/mock-storage")
+    monkeypatch.setenv("BACKEND_MOCK_UPLOAD_TOKEN_TTL_HOURS", "6")
+    monkeypatch.setenv("BACKEND_MAX_ASSET_SIZE_BYTES", "1024")
+    monkeypatch.setenv("BACKEND_UPLOAD_TOKEN_BYTES", "40")
 
     settings = load_settings()
 
@@ -84,6 +88,10 @@ def test_config_can_be_overridden_by_test_environment(monkeypatch) -> None:
     assert settings.public_base_url == "http://testserver"
     assert settings.idempotency_completed_ttl_hours == 12
     assert settings.idempotency_pending_lease_seconds == 30
+    assert settings.mock_storage_directory == "/tmp/mock-storage"
+    assert settings.mock_upload_token_ttl_hours == 6
+    assert settings.max_asset_size_bytes == 1024
+    assert settings.upload_token_bytes == 40
 
 
 def test_authenticated_route_maps_server_side_owner_id() -> None:

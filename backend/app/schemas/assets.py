@@ -56,3 +56,28 @@ class UploadUrlResponse(APIModel):
         if value != AssetStatus.PENDING_UPLOAD:
             raise ValueError("must be PENDING_UPLOAD")
         return value
+
+
+class InternalUploadResponse(APIModel):
+    asset_id: str
+    asset_status: AssetStatus = AssetStatus.READY
+    content_type: str
+    size_bytes: int
+    checksum_sha256: str
+
+    @field_validator("asset_id")
+    @classmethod
+    def validate_asset_id(cls, value: str) -> str:
+        return validate_prefixed_id(value, "asset_")
+
+    @field_validator("asset_status")
+    @classmethod
+    def validate_ready_status(cls, value: AssetStatus) -> AssetStatus:
+        if value != AssetStatus.READY:
+            raise ValueError("must be READY")
+        return value
+
+    @field_validator("checksum_sha256")
+    @classmethod
+    def validate_checksum(cls, value: str) -> str:
+        return validate_sha256(value)

@@ -71,3 +71,70 @@ class IdempotencyPendingError(DomainError):
     message = "An identical request with this Idempotency-Key is still pending."
     required_action = "Retry the same request later with the same Idempotency-Key."
     retryable = True
+
+
+class AssetTypeUnsupportedError(DomainError):
+    status_code = 415
+    code = "ASSET_TYPE_UNSUPPORTED"
+    message = "The asset content type is not supported."
+    field = "content_type"
+    required_action = "Use image/png, image/jpeg, or video/mp4."
+
+
+class SchemaInvalidError(DomainError):
+    status_code = 422
+    code = "SCHEMA_INVALID"
+    message = "Request schema validation failed."
+    required_action = "Fix the request to match the API contract."
+
+
+class AssetTooLargeError(DomainError):
+    status_code = 413
+    code = "ASSET_TOO_LARGE"
+    message = "The asset exceeds the configured maximum size."
+    field = "size_bytes"
+    required_action = "Upload a smaller asset."
+
+
+class AssetInvalidStateError(DomainError):
+    status_code = 409
+    code = "ASSET_INVALID_STATE"
+    message = "The asset is not in a valid state for this operation."
+    required_action = "Create a new upload URL or use an asset that is pending upload."
+
+
+class UploadTokenInvalidError(DomainError):
+    status_code = 404
+    code = "UPLOAD_TOKEN_INVALID"
+    message = "The upload token is invalid."
+    required_action = "Request a new upload URL."
+
+
+class UploadTokenExpiredError(DomainError):
+    status_code = 410
+    code = "UPLOAD_TOKEN_EXPIRED"
+    message = "The upload token has expired."
+    required_action = "Request a new upload URL."
+
+
+class UploadAlreadyCompletedError(DomainError):
+    status_code = 409
+    code = "UPLOAD_ALREADY_COMPLETED"
+    message = "This upload token has already been used."
+    required_action = "Use the uploaded asset or request a new upload URL."
+
+
+class ChecksumMismatchError(DomainError):
+    status_code = 422
+    code = "CHECKSUM_MISMATCH"
+    message = "The uploaded bytes do not match the declared checksum."
+    field = "checksum_sha256"
+    required_action = "Upload bytes matching the declared SHA-256 checksum."
+
+
+class InternalServerError(DomainError):
+    status_code = 500
+    code = "INTERNAL_ERROR"
+    message = "Unexpected server error."
+    required_action = "Retry later or contact support if the issue persists."
+    retryable = True

@@ -347,9 +347,9 @@ def test_transaction_rollback_leaves_no_partial_write(tmp_path: Path) -> None:
         assert session.get(Asset, "asset_rollback") is None
 
 
-def test_no_formal_api_routes_added_beyond_health() -> None:
+def test_no_video_job_routes_added() -> None:
     app = create_app()
-    ignored = {"/openapi.json", "/docs", "/docs/oauth2-redirect", "/redoc"}
-    routes = {route.path for route in app.routes if route.path not in ignored}
+    schema_paths = set(app.openapi()["paths"])
 
-    assert routes == {"/health"}
+    assert schema_paths == {"/health", "/v1/assets/upload-url"}
+    assert not any(path.startswith("/v1/video-jobs") for path in schema_paths)

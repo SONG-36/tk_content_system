@@ -1,6 +1,6 @@
 """Pydantic schemas for the Phase 2A backend foundation."""
 
-from app.schemas.assets import UploadUrlRequest, UploadUrlResponse
+from app.schemas.assets import InternalUploadResponse, UploadUrlRequest, UploadUrlResponse
 from app.schemas.common import ErrorDetail, ErrorResponse, HealthResponse
 from app.schemas.facts import ClientDeclaredFact, SourceRef
 from app.schemas.jobs import (
@@ -38,6 +38,7 @@ __all__ = [
     "HybridAiLayer",
     "HybridLayers",
     "HybridRealLayer",
+    "InternalUploadResponse",
     "PreservationLocks",
     "ProofNeed",
     "ReferenceAsset",

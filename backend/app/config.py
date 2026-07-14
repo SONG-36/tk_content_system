@@ -21,6 +21,12 @@ class Settings(BaseModel):
     public_base_url: str = Field(default="http://localhost:8000")
     idempotency_completed_ttl_hours: int = Field(default=24)
     idempotency_pending_lease_seconds: int = Field(default=60)
+    mock_storage_directory: str = Field(
+        default="~/.cache/car-cleaning-content-backend/mock-storage"
+    )
+    mock_upload_token_ttl_hours: int = Field(default=24)
+    max_asset_size_bytes: int = Field(default=104857600)
+    upload_token_bytes: int = Field(default=32)
 
 
 def load_settings() -> Settings:
@@ -50,6 +56,28 @@ def load_settings() -> Settings:
             os.getenv(
                 "BACKEND_IDEMPOTENCY_PENDING_LEASE_SECONDS",
                 Settings.model_fields["idempotency_pending_lease_seconds"].default,
+            )
+        ),
+        mock_storage_directory=os.getenv(
+            "BACKEND_MOCK_STORAGE_DIRECTORY",
+            Settings.model_fields["mock_storage_directory"].default,
+        ),
+        mock_upload_token_ttl_hours=int(
+            os.getenv(
+                "BACKEND_MOCK_UPLOAD_TOKEN_TTL_HOURS",
+                Settings.model_fields["mock_upload_token_ttl_hours"].default,
+            )
+        ),
+        max_asset_size_bytes=int(
+            os.getenv(
+                "BACKEND_MAX_ASSET_SIZE_BYTES",
+                Settings.model_fields["max_asset_size_bytes"].default,
+            )
+        ),
+        upload_token_bytes=int(
+            os.getenv(
+                "BACKEND_UPLOAD_TOKEN_BYTES",
+                Settings.model_fields["upload_token_bytes"].default,
             )
         ),
     )

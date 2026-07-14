@@ -541,9 +541,9 @@ def test_clock_returns_utc() -> None:
 
 def test_no_formal_routes_or_database_tables_added_by_idempotency() -> None:
     app = create_app()
-    ignored = {"/openapi.json", "/docs", "/docs/oauth2-redirect", "/redoc"}
-    routes = {route.path for route in app.routes if route.path not in ignored}
+    schema_paths = set(app.openapi()["paths"])
     import_models()
 
-    assert routes == {"/health"}
+    assert schema_paths == {"/health", "/v1/assets/upload-url"}
+    assert "/_internal/mock-uploads/{token}" not in schema_paths
     assert set(Base.metadata.tables) == APPROVED_TABLES
