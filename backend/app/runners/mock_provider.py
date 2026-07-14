@@ -87,6 +87,37 @@ class MockProviderRunner:
         except Exception:
             self._best_effort_fail(job_id, "MOCK_RUNNER_INTERNAL_ERROR")
 
+    def cancel_job(self, job_id: str) -> None:
+        now = ensure_utc(self._clock.now())
+        with self._session_factory() as session:
+            job = session.get(VideoJob, job_id)
+            if job is None or job.current_attempt_id is None:
+                return
+            attempt = session.get(JobAttempt, job.current_attempt_id)
+            if attempt is None or attempt.attempt_status != AttemptStatus.CANCEL_REQUESTED:
+                return
+            assert_attempt_transition(AttemptStatus.CANCEL_REQUESTED, AttemptStatus.CANCELLED)
+            assert_job_transition(GenerationStatus.PROCESSING, GenerationStatus.CANCELLED)
+            attempt_ok = self._attempts.transition_attempt(
+                session,
+                attempt_id=attempt.attempt_id,
+                expected_status=AttemptStatus.CANCEL_REQUESTED,
+                target_status=AttemptStatus.CANCELLED,
+                terminal_at=now,
+                now=now,
+            )
+            job_ok = self._jobs.transition_job(
+                session,
+                job_id=job.job_id,
+                expected_status=GenerationStatus.PROCESSING,
+                target_status=GenerationStatus.CANCELLED,
+                now=now,
+            )
+            if attempt_ok and job_ok:
+                session.commit()
+            else:
+                session.rollback()
+
     def _start_attempt(
         self, job_id: str
     ) -> Optional[tuple[str, str, dict[str, object]]]:
@@ -171,13 +202,23 @@ class MockProviderRunner:
             with self._session_factory() as session:
                 job = session.get(VideoJob, job_id)
                 attempt = session.get(JobAttempt, attempt_id)
-                if (
-                    job is None
-                    or attempt is None
-                    or attempt.attempt_status
-                    not in {AttemptStatus.SUBMITTED, AttemptStatus.PROCESSING}
-                    or job.generation_status != GenerationStatus.PROCESSING
-                ):
+                if job is None or attempt is None or job.generation_status != GenerationStatus.PROCESSING:
+                    session.rollback()
+                    self._storage.delete(storage_path)
+                    return
+                if attempt.attempt_status in {
+                    AttemptStatus.CANCELLED,
+                    AttemptStatus.FAILED,
+                    AttemptStatus.UNKNOWN_PROVIDER_STATE,
+                }:
+                    session.rollback()
+                    self._storage.delete(storage_path)
+                    return
+                if attempt.attempt_status not in {
+                    AttemptStatus.SUBMITTED,
+                    AttemptStatus.PROCESSING,
+                    AttemptStatus.CANCEL_REQUESTED,
+                }:
                     session.rollback()
                     self._storage.delete(storage_path)
                     return
@@ -185,13 +226,21 @@ class MockProviderRunner:
                     assert_attempt_transition(
                         AttemptStatus.SUBMITTED, AttemptStatus.PROCESSING
                     )
-                    self._attempts.transition_attempt(
+                    if not self._attempts.transition_attempt(
                         session,
                         attempt_id=attempt_id,
                         expected_status=AttemptStatus.SUBMITTED,
                         target_status=AttemptStatus.PROCESSING,
                         now=now,
-                    )
+                    ):
+                        session.rollback()
+                        self._storage.delete(storage_path)
+                        return
+                    attempt = session.get(JobAttempt, attempt_id)
+                    if attempt is None:
+                        session.rollback()
+                        self._storage.delete(storage_path)
+                        return
                 result_asset = self._assets.create_result_media(
                     session,
                     asset_id=result_asset_id,
@@ -213,24 +262,29 @@ class MockProviderRunner:
                     },
                     now=now,
                 )
-                assert_attempt_transition(AttemptStatus.PROCESSING, AttemptStatus.SUCCEEDED)
+                expected_attempt_status = attempt.attempt_status
+                assert_attempt_transition(expected_attempt_status, AttemptStatus.SUCCEEDED)
                 assert_job_transition(GenerationStatus.PROCESSING, GenerationStatus.SUCCEEDED)
-                self._attempts.transition_attempt(
+                attempt_ok = self._attempts.transition_attempt(
                     session,
                     attempt_id=attempt_id,
-                    expected_status=AttemptStatus.PROCESSING,
+                    expected_status=expected_attempt_status,
                     target_status=AttemptStatus.SUCCEEDED,
                     terminal_at=now,
                     now=now,
                 )
-                self._jobs.transition_job(
+                job_ok = self._jobs.transition_job(
                     session,
                     job_id=job_id,
                     expected_status=GenerationStatus.PROCESSING,
                     target_status=GenerationStatus.SUCCEEDED,
                     now=now,
                 )
-                session.commit()
+                if attempt_ok and job_ok:
+                    session.commit()
+                else:
+                    session.rollback()
+                    self._storage.delete(storage_path)
         except Exception:
             self._storage.delete(storage_path)
             self._best_effort_fail(job_id, "MOCK_RUNNER_INTERNAL_ERROR")

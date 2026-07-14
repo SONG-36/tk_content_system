@@ -81,6 +81,40 @@ class JobAttemptRepository:
             attempt = session.get(JobAttempt, attempt_id)
             return _snapshot(attempt) if attempt is not None else None
 
+    def list_for_job(self, job_id: str) -> list[JobAttemptSnapshot]:
+        with self._session_factory() as session:
+            rows = session.scalars(
+                select(JobAttempt)
+                .where(JobAttempt.job_id == job_id)
+                .order_by(JobAttempt.attempt_no.asc(), JobAttempt.created_at.asc())
+            ).all()
+            return [_snapshot(row) for row in rows]
+
+    def next_attempt_no(self, session: Session, job_id: str) -> int:
+        current_max = session.scalar(
+            select(func.max(JobAttempt.attempt_no)).where(JobAttempt.job_id == job_id)
+        )
+        return int(current_max or 0) + 1
+
+    def set_cancellation_intent(
+        self,
+        session: Session,
+        *,
+        attempt_id: str,
+        now: datetime,
+    ) -> bool:
+        result = session.execute(
+            update(JobAttempt)
+            .where(JobAttempt.attempt_id == attempt_id)
+            .where(JobAttempt.cancellation_intent.is_(False))
+            .values(
+                cancellation_intent=True,
+                cancel_requested_at=now,
+                updated_at=now,
+            )
+        )
+        return result.rowcount == 1
+
     def transition_attempt(
         self,
         session: Session,

@@ -164,8 +164,10 @@ def test_all_valid_schema_models_serialize() -> None:
         attempt_id="attempt_1",
         attempt_no=1,
         attempt_status=AttemptStatus.PREPARED,
+        execution_provider=ExecutionProvider.mock,
         cancellation_intent=False,
         created_at=now,
+        updated_at=now,
     )
     asset = AssetSummary(
         asset_id="asset_1",
@@ -173,6 +175,7 @@ def test_all_valid_schema_models_serialize() -> None:
         asset_status=AssetStatus.READY,
         content_type="image/png",
         size_bytes=1,
+        checksum_sha256="a" * 64,
         usage_role=UsageRole.PRODUCT_IDENTITY,
     )
     result = ResultMediaSummary(
@@ -441,7 +444,14 @@ def test_formal_api_routes_match_phase_2a_6_surface() -> None:
     app = create_app()
     schema_paths = set(app.openapi()["paths"])
 
-    assert schema_paths == {"/health", "/v1/assets/upload-url", "/v1/video-jobs"}
+    assert schema_paths == {
+        "/health",
+        "/v1/assets/upload-url",
+        "/v1/video-jobs",
+        "/v1/video-jobs/{job_id}",
+        "/v1/video-jobs/{job_id}/cancel",
+        "/v1/video-jobs/{job_id}/retry",
+    }
     assert "/_internal/mock-uploads/{token}" not in schema_paths
 
 

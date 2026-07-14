@@ -5,7 +5,7 @@ from __future__ import annotations
 import os
 from functools import lru_cache
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class Settings(BaseModel):
@@ -25,8 +25,19 @@ class Settings(BaseModel):
         default="~/.cache/car-cleaning-content-backend/mock-storage"
     )
     mock_upload_token_ttl_hours: int = Field(default=24)
+    result_token_secret: str = Field(default="dev-result-token-secret-change-me-32")
+    result_token_ttl_hours: int = Field(default=24)
     max_asset_size_bytes: int = Field(default=104857600)
     upload_token_bytes: int = Field(default=32)
+
+    @model_validator(mode="after")
+    def validate_secrets(self) -> "Settings":
+        if self.result_token_secret == self.api_key:
+            raise ValueError("result_token_secret must differ from api_key.")
+        if self.environment.lower() in {"production", "prod"}:
+            if len(self.result_token_secret) < 32:
+                raise ValueError("result_token_secret must be at least 32 characters.")
+        return self
 
 
 def load_settings() -> Settings:
@@ -66,6 +77,16 @@ def load_settings() -> Settings:
             os.getenv(
                 "BACKEND_MOCK_UPLOAD_TOKEN_TTL_HOURS",
                 Settings.model_fields["mock_upload_token_ttl_hours"].default,
+            )
+        ),
+        result_token_secret=os.getenv(
+            "BACKEND_RESULT_TOKEN_SECRET",
+            Settings.model_fields["result_token_secret"].default,
+        ),
+        result_token_ttl_hours=int(
+            os.getenv(
+                "BACKEND_RESULT_TOKEN_TTL_HOURS",
+                Settings.model_fields["result_token_ttl_hours"].default,
             )
         ),
         max_asset_size_bytes=int(

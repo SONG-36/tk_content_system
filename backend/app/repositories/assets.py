@@ -86,6 +86,33 @@ class AssetRepository:
             asset = session.get(Asset, asset_id)
             return _snapshot(asset) if asset is not None else None
 
+    def list_by_ids_and_owner(
+        self, *, asset_ids: list[str], owner_id: str
+    ) -> list[AssetSnapshot]:
+        if not asset_ids:
+            return []
+        with self._session_factory() as session:
+            rows = session.scalars(
+                select(Asset).where(
+                    Asset.asset_id.in_(asset_ids),
+                    Asset.owner_id == owner_id,
+                )
+            ).all()
+            return [_snapshot(row) for row in rows]
+
+    def get_result_asset_by_id_and_owner(
+        self, *, asset_id: str, owner_id: str
+    ) -> Optional[AssetSnapshot]:
+        with self._session_factory() as session:
+            asset = session.scalar(
+                select(Asset).where(
+                    Asset.asset_id == asset_id,
+                    Asset.owner_id == owner_id,
+                    Asset.asset_kind == AssetKind.RESULT_MEDIA,
+                )
+            )
+            return _snapshot(asset) if asset is not None else None
+
     def get_by_upload_token_hash(
         self, upload_token_hash: str
     ) -> Optional[AssetSnapshot]:

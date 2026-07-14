@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from contextlib import asynccontextmanager
 from typing import Optional
 
 from fastapi import Depends, FastAPI, Request
@@ -10,6 +11,7 @@ from fastapi.responses import JSONResponse
 
 from app.api.assets import router as assets_router
 from app.api.health import router as health_router
+from app.api.internal_mock_results import router as internal_mock_results_router
 from app.api.internal_mock_uploads import router as internal_mock_uploads_router
 from app.api.video_jobs import router as video_jobs_router
 from app.config import Settings, get_settings
@@ -59,15 +61,9 @@ def create_app(
     """Create the FastAPI app with foundation middleware and handlers."""
 
     settings = settings_override or get_settings()
-    app = FastAPI(title=settings.app_name)
 
-    if settings_override is not None:
-        app.dependency_overrides[get_settings] = lambda: settings_override
-
-    app.middleware("http")(request_id_middleware)
-
-    @app.on_event("startup")
-    async def recover_interrupted_mock_attempts() -> None:
+    @asynccontextmanager
+    async def lifespan(app: FastAPI):
         engine = create_db_engine(settings.database_url)
         session_factory = sessionmaker(
             bind=engine,
@@ -76,6 +72,14 @@ def create_app(
             future=True,
         )
         StartupRecoveryService(session_factory=session_factory).recover_mock_attempts()
+        yield
+
+    app = FastAPI(title=settings.app_name, lifespan=lifespan)
+
+    if settings_override is not None:
+        app.dependency_overrides[get_settings] = lambda: settings_override
+
+    app.middleware("http")(request_id_middleware)
 
     @app.exception_handler(DomainError)
     async def handle_domain_error(request: Request, exc: DomainError) -> JSONResponse:
@@ -111,6 +115,7 @@ def create_app(
     app.include_router(assets_router)
     app.include_router(video_jobs_router)
     app.include_router(internal_mock_uploads_router)
+    app.include_router(internal_mock_results_router)
 
     if include_test_routes:
 

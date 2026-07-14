@@ -14,6 +14,7 @@ from app.config import Settings, get_settings
 from app.db.session import create_db_engine
 from app.services.assets import AssetService
 from app.services.errors import AuthInvalidError, AuthRequiredError
+from app.services.mock_results import MockResultService
 from app.services.video_jobs import VideoJobService
 from app.runners.mock_provider import MockProviderRunner
 
@@ -60,6 +61,13 @@ def get_video_job_service(settings: Settings = Depends(get_settings)) -> VideoJo
 
 def get_mock_provider_runner(settings: Settings = Depends(get_settings)) -> MockProviderRunner:
     return MockProviderRunner(
+        settings=settings,
+        session_factory=_session_factory_for_url(settings.database_url),
+    )
+
+
+def get_mock_result_service(settings: Settings = Depends(get_settings)) -> MockResultService:
+    return MockResultService(
         settings=settings,
         session_factory=_session_factory_for_url(settings.database_url),
     )

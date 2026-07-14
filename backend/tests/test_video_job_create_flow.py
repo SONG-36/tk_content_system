@@ -847,10 +847,14 @@ def test_phase_2a_6_openapi_and_tables_boundary() -> None:
     paths = set(app.openapi()["paths"])
     import_models()
 
-    assert paths == {"/health", "/v1/assets/upload-url", "/v1/video-jobs"}
+    assert paths == {
+        "/health",
+        "/v1/assets/upload-url",
+        "/v1/video-jobs",
+        "/v1/video-jobs/{job_id}",
+        "/v1/video-jobs/{job_id}/cancel",
+        "/v1/video-jobs/{job_id}/retry",
+    }
     assert "/_internal/mock-uploads/{token}" not in paths
     assert "/_internal/mock-results/{token}" not in paths
-    assert "/v1/video-jobs/{job_id}" not in paths
-    assert "/v1/video-jobs/{job_id}/cancel" not in paths
-    assert "/v1/video-jobs/{job_id}/retry" not in paths
     assert set(Base.metadata.tables) == APPROVED_TABLES

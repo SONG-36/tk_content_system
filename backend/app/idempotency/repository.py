@@ -6,7 +6,7 @@ from collections.abc import Callable
 from datetime import datetime
 from typing import Any, Optional
 
-from sqlalchemy import Select, select, update
+from sqlalchemy import Select, delete, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -234,6 +234,18 @@ class IdempotencyRepository:
             session.commit()
             session.refresh(record)
             return _snapshot(record)
+
+    def abandon_pending(self, record_id: str) -> bool:
+        with self._session_factory() as session:
+            result = session.execute(
+                delete(IdempotencyRecord)
+                .where(IdempotencyRecord.idempotency_record_id == record_id)
+                .where(IdempotencyRecord.status == IdempotencyStatus.PENDING)
+                .where(IdempotencyRecord.resource_type.is_(None))
+                .where(IdempotencyRecord.resource_id.is_(None))
+            )
+            session.commit()
+            return result.rowcount == 1
 
 
 def _scope_query(scope: IdempotencyScope) -> Select[tuple[IdempotencyRecord]]:

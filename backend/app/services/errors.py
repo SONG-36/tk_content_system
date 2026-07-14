@@ -195,3 +195,59 @@ class ProviderUnsupportedError(DomainError):
     code = "PROVIDER_UNSUPPORTED"
     message = "The selected model and execution provider are not supported in Phase 2A."
     required_action = "Use selected_model=Seedance and execution_provider=mock."
+
+
+class JobNotFoundError(DomainError):
+    status_code = 404
+    code = "JOB_NOT_FOUND"
+    message = "The video job was not found."
+    required_action = "Use a job_id visible to the authenticated owner."
+
+
+class JobCancelNotAllowedError(DomainError):
+    status_code = 409
+    code = "JOB_CANCEL_NOT_ALLOWED"
+    message = "This video job cannot be cancelled from its current state."
+    required_action = "Cancel only queued or processing jobs."
+
+
+class JobInvalidStateError(DomainError):
+    status_code = 409
+    code = "JOB_INVALID_STATE"
+    message = "The video job is in an invalid state for this operation."
+    required_action = "Refresh the job and retry only if the current state allows it."
+
+
+class JobNotRetryableError(DomainError):
+    status_code = 409
+    code = "JOB_NOT_RETRYABLE"
+    message = "This video job is not retryable from its current state."
+    required_action = "Retry only failed or cancelled jobs with matching terminal attempts."
+
+
+class UnknownProviderStateError(DomainError):
+    status_code = 409
+    code = "UNKNOWN_PROVIDER_STATE"
+    message = "The provider state is unknown and cannot be retried safely."
+    required_action = "Wait for provider reconciliation before retrying."
+
+
+class ResultTokenInvalidError(DomainError):
+    status_code = 404
+    code = "RESULT_TOKEN_INVALID"
+    message = "The result token is invalid."
+    required_action = "Refresh the job and use a current result URL."
+
+
+class ResultUrlExpiredError(DomainError):
+    status_code = 410
+    code = "RESULT_URL_EXPIRED"
+    message = "The result URL has expired."
+    required_action = "Refresh the job to receive a new result URL."
+
+
+class ResultNotReadyError(DomainError):
+    status_code = 409
+    code = "RESULT_NOT_READY"
+    message = "The result media is not ready for download."
+    required_action = "Wait for the job to succeed and refresh the result URL."

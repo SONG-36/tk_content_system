@@ -353,5 +353,11 @@ def test_only_create_video_job_route_added() -> None:
     app = create_app()
     schema_paths = set(app.openapi()["paths"])
 
-    assert schema_paths == {"/health", "/v1/assets/upload-url", "/v1/video-jobs"}
-    assert "/v1/video-jobs/{job_id}" not in schema_paths
+    assert schema_paths == {
+        "/health",
+        "/v1/assets/upload-url",
+        "/v1/video-jobs",
+        "/v1/video-jobs/{job_id}",
+        "/v1/video-jobs/{job_id}/cancel",
+        "/v1/video-jobs/{job_id}/retry",
+    }

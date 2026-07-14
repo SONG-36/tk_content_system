@@ -228,6 +228,7 @@ class AttemptSummary(APIModel):
     attempt_id: str
     attempt_no: int
     attempt_status: AttemptStatus
+    execution_provider: ExecutionProvider
     provider_job_id: Optional[str] = None
     cancellation_intent: bool
     cancel_requested_at: Optional[datetime] = None
@@ -235,6 +236,7 @@ class AttemptSummary(APIModel):
     created_at: datetime
     submitted_at: Optional[datetime] = None
     terminal_at: Optional[datetime] = None
+    updated_at: datetime
 
     @field_validator("attempt_id")
     @classmethod
@@ -248,6 +250,7 @@ class AssetSummary(APIModel):
     asset_status: AssetStatus
     content_type: str
     size_bytes: int
+    checksum_sha256: str
     usage_role: Optional[UsageRole] = None
 
     @field_validator("asset_id")

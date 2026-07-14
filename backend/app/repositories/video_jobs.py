@@ -116,6 +116,30 @@ class VideoJobRepository:
         )
         return result.rowcount == 1
 
+    def transition_job_and_current_attempt(
+        self,
+        session: Session,
+        *,
+        job_id: str,
+        expected_status: GenerationStatus,
+        expected_current_attempt_id: str,
+        target_status: GenerationStatus,
+        target_current_attempt_id: str,
+        now: datetime,
+    ) -> bool:
+        result = session.execute(
+            update(VideoJob)
+            .where(VideoJob.job_id == job_id)
+            .where(VideoJob.generation_status == expected_status)
+            .where(VideoJob.current_attempt_id == expected_current_attempt_id)
+            .values(
+                generation_status=target_status,
+                current_attempt_id=target_current_attempt_id,
+                updated_at=now,
+            )
+        )
+        return result.rowcount == 1
+
     def mark_current_job_failed_for_attempt(
         self,
         session: Session,

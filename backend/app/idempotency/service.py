@@ -131,6 +131,9 @@ class IdempotencyService:
             now=self._now(),
         )
 
+    def abandon(self, record_id: str) -> bool:
+        return self._repository.abandon_pending(record_id)
+
     def _handle_existing(
         self,
         *,

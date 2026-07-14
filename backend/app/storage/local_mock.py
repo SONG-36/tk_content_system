@@ -51,6 +51,18 @@ class LocalMockStorage:
             data=data,
         )
 
+    @property
+    def result_base_directory(self) -> Path:
+        return (self.base_directory / "results").resolve()
+
+    def resolve_result_path(self, storage_path: str) -> Path:
+        path = Path(storage_path).expanduser().resolve()
+        try:
+            path.relative_to(self.result_base_directory)
+        except ValueError as exc:
+            raise ValueError("Resolved result path escaped results directory.") from exc
+        return path
+
     def delete(self, storage_path: str) -> None:
         path = Path(storage_path).expanduser().resolve()
         try:
