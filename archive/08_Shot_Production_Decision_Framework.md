@@ -1,3 +1,14 @@
+# Deprecated Notice
+
+This file is archived and deprecated.
+
+- It is retained as a historical intermediate framework.
+- The only formal Knowledge 08 for GPT Builder upload is:
+  `knowledge/08_Shot_Production_Planning_Framework.md`
+- Do not upload this archived file together with the formal Knowledge 08.
+
+---
+
 # 08. Shot Production Decision Framework
 
 
