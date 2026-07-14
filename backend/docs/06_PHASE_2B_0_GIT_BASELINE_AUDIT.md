@@ -1,0 +1,311 @@
+# Phase 2B-0 Git Baseline Audit
+
+```yaml
+phase_2b_0_status: PASS
+phase_2a_baseline_ready_to_commit: true
+audit_date: "2026-07-14"
+git_branch: "main"
+head_commit: "04e23c5"
+head_subject: "Phase 2A-9: Custom GPT Action OpenAPI, E2E, design audit and final acceptance"
+```
+
+## Phase 2A File Integrity
+
+Required Phase 2A directories and files exist:
+
+- `backend/app/`
+- `backend/alembic/`
+- `backend/tests/`
+- `backend/openapi/custom_gpt_action.openapi.yaml`
+- `backend/tools/export_action_openapi.py`
+- `backend/docs/05_PHASE_2A_ACCEPTANCE_REPORT.md`
+- `backend/pyproject.toml`
+- `backend/alembic.ini`
+
+Seven approved ORM model files exist:
+
+- `assets`: `backend/app/models/asset.py`
+- `video_jobs`: `backend/app/models/video_job.py`
+- `job_attempts`: `backend/app/models/job_attempt.py`
+- `generation_request_snapshots`: `backend/app/models/generation_request_snapshot.py`
+- `job_asset_references`: `backend/app/models/job_asset_reference.py`
+- `provider_results`: `backend/app/models/provider_result.py`
+- `idempotency_records`: `backend/app/models/idempotency_record.py`
+
+Public interface code exists for:
+
+- `GET /health`
+- `POST /v1/assets/upload-url`
+- `POST /v1/video-jobs`
+- `GET /v1/video-jobs/{job_id}`
+- `POST /v1/video-jobs/{job_id}/cancel`
+- `POST /v1/video-jobs/{job_id}/retry`
+
+Internal interface code exists for:
+
+- `PUT /_internal/mock-uploads/{token}`
+- `GET /_internal/mock-results/{token}`
+
+## Git State
+
+Audit commands executed:
+
+- `git status --short --untracked-files=all`
+- `git diff --name-status HEAD -- backend`
+- `git ls-files --others --exclude-standard backend`
+- `git log -5 --oneline --stat`
+
+Findings:
+
+- Phase 2A-5 through Phase 2A-9 are present in recent Git history.
+- Current HEAD is `04e23c5`, the Phase 2A-9 acceptance commit.
+- Phase 2A backend code and tests are tracked at HEAD.
+- No backend files are modified relative to HEAD.
+- No untracked backend files remain.
+- This audit modified only `.gitignore` and created this report.
+- No unexpected deletions were detected.
+- No required Phase 2A file exists only in a temporary directory.
+- No duplicate or wrong-path Phase 2A backend files were detected.
+
+## Tracked, Modified, And Untracked Scope
+
+Tracked Phase 2A scope includes:
+
+- Backend application code under `backend/app/`.
+- Alembic configuration and migration under `backend/alembic*`.
+- Backend tests under `backend/tests/`.
+- Action OpenAPI artifact under `backend/openapi/`.
+- Export tool under `backend/tools/`.
+- Acceptance report under `backend/docs/05_PHASE_2A_ACCEPTANCE_REPORT.md`.
+
+Modified in this audit:
+
+- `.gitignore`
+
+Created in this audit:
+
+- `backend/docs/06_PHASE_2B_0_GIT_BASELINE_AUDIT.md`
+
+Untracked backend files before this report:
+
+- None.
+
+## Sensitive File Audit
+
+Backend file-extension scan excluding the approved fixture found no:
+
+- `.env` or `.env.*`
+- SQLite databases
+- logs
+- temporary files
+- upload files
+- result videos
+- binary token or secret files
+
+Allowed tracked media fixture:
+
+- `backend/app/providers/fixtures/mock_result.mp4`
+
+Keyword scan findings:
+
+- Matches for API key, Bearer, token, secret, and result token terms occur in
+  configuration code, tests, docs, and placeholder/default field names.
+- No real API key, Cloudflare token, OpenAI key, Seedance key, ByteDance key,
+  BytePlus key, database password, or production secret was identified.
+- The generated Action OpenAPI does not expose real API keys, owner mappings,
+  token hashes, storage paths, database URLs, or result token secrets.
+
+Repository note:
+
+- `source/open_source/**` contains many third-party example assets and sample
+  data files. These are pre-existing third-party sources and are outside the
+  Phase 2A backend runtime baseline.
+
+## Absolute Path Audit
+
+No developer-machine absolute path was found in Phase 2A runtime defaults,
+Action OpenAPI, backend deployment-facing docs, API examples, or response
+schemas.
+
+Allowed occurrences:
+
+- Tests construct temporary paths.
+- Historical draft/reference docs may mention local paths as design context.
+
+## `.gitignore` Audit
+
+Root `.gitignore` was incomplete before this audit. It now ignores:
+
+- `.env`
+- `.env.*`
+- `!.env.example`
+- `!.env.*.example`
+- `__pycache__/`
+- `*.py[cod]`
+- `.pytest_cache/`
+- `.mypy_cache/`
+- `.ruff_cache/`
+- `.coverage`
+- `htmlcov/`
+- `*.db`
+- `*.sqlite`
+- `*.sqlite3`
+- `backend/data/`
+- `backend/runtime/`
+- `backend/mock_storage/`
+- `backend/uploads/`
+- `backend/results/`
+- `*.log`
+- `*.tmp`
+- `*.temp`
+
+It does not ignore:
+
+- `backend/app/providers/fixtures/mock_result.mp4`
+- `backend/openapi/custom_gpt_action.openapi.yaml`
+- `backend/alembic/versions/*.py`
+- `backend/docs/*.md`
+- `backend/tests/*.py`
+
+## Runtime Artifact Audit
+
+Detected runtime/cache artifacts:
+
+- `backend/.pytest_cache/`
+
+Risk assessment:
+
+- This is a pytest cache generated by validation.
+- It is ignored by `.gitignore`.
+- It is not a database, upload, generated result video, log, or secret.
+
+No backend runtime database, mock upload, mock result, local log, coverage file,
+or temporary OpenAPI artifact is pending commit.
+
+## Phase 2A Regression Verification
+
+Commands executed:
+
+- `python3 -m pytest backend -q`
+- `python3 -m pytest backend --collect-only`
+- `python3 -m compileall backend/app backend/tools`
+- `python3 backend/tools/export_action_openapi.py`
+
+Results:
+
+```text
+196 tests collected
+196 passed
+0 failed
+0 skipped
+0 warnings reported
+```
+
+`compileall` result:
+
+```text
+PASS
+```
+
+## OpenAPI Verification
+
+OpenAPI artifact:
+
+- `backend/openapi/custom_gpt_action.openapi.yaml`
+
+Results:
+
+- Parses successfully.
+- Consecutive exports are byte-for-byte identical.
+- Contains exactly six public paths.
+- Excludes both internal mock routes.
+- Contains stable operation IDs:
+  `healthCheck`, `createAssetUploadUrl`, `createVideoJob`, `getVideoJob`,
+  `cancelVideoJob`, `retryVideoJob`.
+
+Public paths:
+
+- `/health`
+- `/v1/assets/upload-url`
+- `/v1/video-jobs`
+- `/v1/video-jobs/{job_id}`
+- `/v1/video-jobs/{job_id}/cancel`
+- `/v1/video-jobs/{job_id}/retry`
+
+## Alembic Verification
+
+Alembic was verified with a temporary SQLite database and explicit config:
+
+- `upgrade head`: PASS
+- `downgrade base`: PASS
+- `upgrade head`: PASS
+
+Upgrade/re-upgrade tables:
+
+- `alembic_version`
+- `assets`
+- `generation_request_snapshots`
+- `idempotency_records`
+- `job_asset_references`
+- `job_attempts`
+- `provider_results`
+- `video_jobs`
+
+After downgrade:
+
+- `alembic_version`
+
+Runtime SQLAlchemy metadata business tables:
+
+- `assets`
+- `generation_request_snapshots`
+- `idempotency_records`
+- `job_asset_references`
+- `job_attempts`
+- `provider_results`
+- `video_jobs`
+
+## Implementation Boundary Audit
+
+No Phase 2A runtime code path was found for:
+
+- Real Seedance HTTP calls.
+- ByteDance or BytePlus API calls.
+- `requests`, `httpx`, `aiohttp`, or external provider network calls.
+- Redis.
+- Celery.
+- External object storage.
+- PRODUCT_LINK fetching.
+- Knowledge Markdown runtime parsing.
+- Public mock scenario/outcome parameter.
+- Knowledge 10 Review implementation.
+- Paid API calls.
+- Seventh public business endpoint.
+
+## Recommended Commit Scope
+
+Phase 2A baseline already exists at HEAD `04e23c5`.
+
+Recommended additional commit for this audit:
+
+- `.gitignore`
+- `backend/docs/06_PHASE_2B_0_GIT_BASELINE_AUDIT.md`
+
+Do not commit:
+
+- `backend/.pytest_cache/`
+- local SQLite databases
+- backend runtime storage directories
+- uploads
+- generated result videos
+- logs
+- `.env` files
+- temporary files
+
+## Final Decision
+
+All blocking checks passed.
+
+It is safe for a human operator to create a Git baseline commit for this
+Phase 2B-0 audit and then decide whether to tag the desired Phase 2A baseline
+commit.

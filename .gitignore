@@ -5,5 +5,35 @@
 *~
 .vscode/
 .idea/
+
+# Environment and local secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Python
 __pycache__/
+*.py[cod]
 .pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Local databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Backend runtime storage
+backend/data/
+backend/runtime/
+backend/mock_storage/
+backend/uploads/
+backend/results/
+
+# Local logs and temporary files
+*.log
+*.tmp
+*.temp
