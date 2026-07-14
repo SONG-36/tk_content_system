@@ -30,6 +30,7 @@ class AssetSnapshot:
     upload_token_hash: Optional[str]
     upload_token_expires_at: Optional[datetime]
     upload_token_used_at: Optional[datetime]
+    deleted_at: Optional[datetime]
     created_at: datetime
     updated_at: datetime
 
@@ -139,6 +140,7 @@ def _snapshot(asset: Asset) -> AssetSnapshot:
             if asset.upload_token_used_at is not None
             else None
         ),
+        deleted_at=ensure_utc(asset.deleted_at) if asset.deleted_at is not None else None,
         created_at=ensure_utc(asset.created_at),
         updated_at=ensure_utc(asset.updated_at),
     )

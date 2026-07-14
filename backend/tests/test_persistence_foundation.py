@@ -347,9 +347,9 @@ def test_transaction_rollback_leaves_no_partial_write(tmp_path: Path) -> None:
         assert session.get(Asset, "asset_rollback") is None
 
 
-def test_no_video_job_routes_added() -> None:
+def test_only_create_video_job_route_added() -> None:
     app = create_app()
     schema_paths = set(app.openapi()["paths"])
 
-    assert schema_paths == {"/health", "/v1/assets/upload-url"}
-    assert not any(path.startswith("/v1/video-jobs") for path in schema_paths)
+    assert schema_paths == {"/health", "/v1/assets/upload-url", "/v1/video-jobs"}
+    assert "/v1/video-jobs/{job_id}" not in schema_paths

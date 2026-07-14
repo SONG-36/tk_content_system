@@ -14,6 +14,7 @@ from app.config import Settings, get_settings
 from app.db.session import create_db_engine
 from app.services.assets import AssetService
 from app.services.errors import AuthInvalidError, AuthRequiredError
+from app.services.video_jobs import VideoJobService
 
 bearer_scheme = HTTPBearer(auto_error=False)
 
@@ -44,6 +45,13 @@ def _session_factory_for_url(database_url: str):
 
 def get_asset_service(settings: Settings = Depends(get_settings)) -> AssetService:
     return AssetService(
+        settings=settings,
+        session_factory=_session_factory_for_url(settings.database_url),
+    )
+
+
+def get_video_job_service(settings: Settings = Depends(get_settings)) -> VideoJobService:
+    return VideoJobService(
         settings=settings,
         session_factory=_session_factory_for_url(settings.database_url),
     )

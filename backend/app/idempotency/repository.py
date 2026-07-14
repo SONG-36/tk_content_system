@@ -161,6 +161,29 @@ class IdempotencyRepository:
                 return _snapshot(record)
             raise ValueError("Idempotency record is already bound to another resource.")
 
+    def bind_resource_in_session(
+        self,
+        session: Session,
+        *,
+        record_id: str,
+        resource_type: str,
+        resource_id: str,
+        now: datetime,
+    ) -> None:
+        record = session.get(IdempotencyRecord, record_id)
+        if record is None:
+            raise ValueError("Idempotency record not found.")
+        if record.status != IdempotencyStatus.PENDING:
+            raise ValueError("Only PENDING idempotency records can bind resources.")
+        if record.resource_type is None and record.resource_id is None:
+            record.resource_type = resource_type
+            record.resource_id = resource_id
+            record.updated_at = now
+            return
+        if record.resource_type == resource_type and record.resource_id == resource_id:
+            return
+        raise ValueError("Idempotency record is already bound to another resource.")
+
     def complete(
         self,
         *,

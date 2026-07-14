@@ -437,11 +437,11 @@ def test_request_validation_error_uses_unified_422_envelope() -> None:
     assert payload["error"]["details"]["errors"]
 
 
-def test_formal_api_routes_match_phase_2a_5_surface() -> None:
+def test_formal_api_routes_match_phase_2a_6_surface() -> None:
     app = create_app()
     schema_paths = set(app.openapi()["paths"])
 
-    assert schema_paths == {"/health", "/v1/assets/upload-url"}
+    assert schema_paths == {"/health", "/v1/assets/upload-url", "/v1/video-jobs"}
     assert "/_internal/mock-uploads/{token}" not in schema_paths
 
 

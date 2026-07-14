@@ -544,6 +544,6 @@ def test_no_formal_routes_or_database_tables_added_by_idempotency() -> None:
     schema_paths = set(app.openapi()["paths"])
     import_models()
 
-    assert schema_paths == {"/health", "/v1/assets/upload-url"}
+    assert schema_paths == {"/health", "/v1/assets/upload-url", "/v1/video-jobs"}
     assert "/_internal/mock-uploads/{token}" not in schema_paths
     assert set(Base.metadata.tables) == APPROVED_TABLES

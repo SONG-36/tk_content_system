@@ -11,6 +11,7 @@ from fastapi.responses import JSONResponse
 from app.api.assets import router as assets_router
 from app.api.health import router as health_router
 from app.api.internal_mock_uploads import router as internal_mock_uploads_router
+from app.api.video_jobs import router as video_jobs_router
 from app.config import Settings, get_settings
 from app.dependencies import OwnerContext, require_owner_context
 from app.middleware.request_id import request_id_middleware
@@ -94,6 +95,7 @@ def create_app(
 
     app.include_router(health_router)
     app.include_router(assets_router)
+    app.include_router(video_jobs_router)
     app.include_router(internal_mock_uploads_router)
 
     if include_test_routes:

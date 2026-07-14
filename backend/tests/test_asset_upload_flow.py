@@ -314,7 +314,8 @@ def test_internal_upload_route_is_not_in_openapi(tmp_path: Path) -> None:
     assert "/health" in paths
     assert "/v1/assets/upload-url" in paths
     assert "/_internal/mock-uploads/{token}" not in paths
-    assert not any(path.startswith("/v1/video-jobs") for path in paths)
+    assert "/v1/video-jobs" in paths
+    assert "/v1/video-jobs/{job_id}" not in paths
 
 
 def test_internal_upload_invalid_token_returns_error_envelope(tmp_path: Path) -> None:
