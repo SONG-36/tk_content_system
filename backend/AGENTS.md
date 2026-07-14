@@ -7,8 +7,12 @@ These rules apply to `backend/`.
 `backend/` is reserved for an independently deployable FastAPI backend that will
 serve the Custom GPT through versioned JSON APIs.
 
-Phase 2A is boundary and contract work only unless a later task explicitly asks
-for implementation.
+`backend/docs/BACKEND_MASTER_DESIGN.md` is the authoritative backend design.
+All backend implementation and contract work must follow it. If any other
+backend document conflicts with it, the Master Design wins.
+
+Phase 2A implementation is allowed only within the scope approved by
+`BACKEND_MASTER_DESIGN.md`.
 
 ## Runtime Boundary
 
@@ -25,10 +29,18 @@ validators, service code, and tests before backend runtime can use them.
 
 ## Provider Boundary
 
-Phase 2A supports only `execution_provider=mock`.
+Phase 2A supports only `selected_model=Seedance` and
+`execution_provider=mock` in the public Custom GPT Action contract.
 
-Do not connect real Seedance, ByteDance, BytePlus, storage, queue, Redis,
-database, or billing services in Phase 2A.
+Phase 2A requires local SQLite + SQLAlchemy 2.x + Alembic. Do not prohibit or
+remove the local SQLite database required by the Master Design.
+
+Do not connect real Seedance, ByteDance, BytePlus, production/external object
+storage, queue, Redis, external database services, or billing services in
+Phase 2A.
+
+Local mock upload/result storage is allowed for Phase 2A tests and local
+development.
 
 Keep `selected_model` separate from `execution_provider`:
 
@@ -52,4 +64,6 @@ generation, or create cost must require `Idempotency-Key`.
 ## Tests
 
 Backend behavior must be deterministic and testable with mock providers before
-any external adapter is introduced.
+any external adapter is introduced. State-machine tests should verify runner and
+repository transitions directly; API polling is not required to observe every
+short-lived intermediate state.
