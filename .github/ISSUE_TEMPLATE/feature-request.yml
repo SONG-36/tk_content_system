@@ -1,0 +1,44 @@
+name: Feature Request
+description: Request a new capability that is not a defect.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this only for new capability requests. If current behavior violates an existing approved contract, use Custom GPT Defect.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or Opportunity
+      description: What user or workflow need does this feature address?
+    validations:
+      required: true
+  - type: textarea
+    id: proposed_behavior
+    attributes:
+      label: Proposed Behavior
+      description: Describe the desired behavior without assuming implementation details.
+    validations:
+      required: true
+  - type: textarea
+    id: why_not_defect
+    attributes:
+      label: Why this is not a defect
+      description: Explain why current behavior does not violate an existing approved contract.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Custom GPT routing
+        - Knowledge/Product Pack
+        - Builder workflow
+        - Backend Action
+        - Testing or release process
+        - Other
+    validations:
+      required: true

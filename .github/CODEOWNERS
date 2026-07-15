@@ -1,0 +1,10 @@
+# Replace @PROJECT_OWNER before enabling CODEOWNERS enforcement.
+
+/custom_gpt_package/multi_category_gpt/00_INSTRUCTIONS/ @PROJECT_OWNER
+/custom_gpt_package/multi_category_gpt/01_KNOWLEDGE_UPLOAD/ @PROJECT_OWNER
+/knowledge/ @PROJECT_OWNER
+/instructions/ @PROJECT_OWNER
+/workflows/ @PROJECT_OWNER
+/categories/ @PROJECT_OWNER
+/optimization/ @PROJECT_OWNER
+/backend/ @PROJECT_OWNER

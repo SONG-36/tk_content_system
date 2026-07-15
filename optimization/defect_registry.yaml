@@ -1,0 +1,7 @@
+registry:
+  schema_version: "1.0"
+  active_defects: []
+  closed_defects: []
+
+# Each real defect must use an independent Markdown file under
+# optimization/defects/. This registry is only an index.
