@@ -1,0 +1,31 @@
+services:
+  video-backend:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - ./env.phase2b.example
+    environment:
+      BACKEND_DATABASE_URL: sqlite:////data/database/backend.db
+      BACKEND_MOCK_STORAGE_DIRECTORY: /data/mock_storage
+      BACKEND_PUBLIC_BASE_URL: ${BACKEND_PUBLIC_BASE_URL:-http://127.0.0.1:8000}
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - phase2b_database:/data/database
+      - phase2b_mock_storage:/data/mock_storage
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=2).read()"
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  phase2b_database:
+  phase2b_mock_storage:
